@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Share Location</title>
+</head>
+
+<body>
+  <h2>Share your location</h2>
+  <button id="share">Share my location</button>
+  <p id="status"></p>
+
+  <script type="module">
+    import { initializeApp } from
+      "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+
+    import {
+      getDatabase,
+      ref,
+      set
+    } from
+      "https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAcZ7ZXY3rTkZT6jZ55Tm9qDQicMJ6E2jA",
+      authDomain: "amrolocation.firebaseapp.com",
+      databaseURL: "https://amrolocation-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "amrolocation",
+      storageBucket: "amrolocation.firebasestorage.app",
+      messagingSenderId: "157641871095",
+      appId: "1:157641871095:web:4b197ee8474938c83c0df2"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    document.getElementById("share").onclick = () => {
+
+      document.getElementById("status").textContent =
+        "Requesting location permission...";
+
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+
+          const latitude = position.coords.latitude;
+          const longitude = position.coords.longitude;
+
+          await set(ref(db, "sharedLocation"), {
+            latitude: latitude,
+            longitude: longitude,
+            time: Date.now()
+          });
+
+          document.getElementById("status").textContent =
+            "Location shared successfully.";
+        },
+
+        () => {
+          document.getElementById("status").textContent =
+            "Location permission was denied.";
+        }
+      );
+    };
+  </script>
+</body>
+</html>
