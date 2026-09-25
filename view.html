@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Live Location</title>
+
+  <style>
+    #map {
+      width: 100%;
+      height: 80vh;
+    }
+
+    #status {
+      padding: 10px;
+      font-family: Arial;
+    }
+  </style>
+</head>
+
+<body>
+
+<div id="status">Waiting for location...</div>
+<div id="map"></div>
+
+<script type="module">
+
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+
+import {
+  getDatabase,
+  ref,
+  onValue
+}
+from "https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js";
+
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAcZ7ZXY3rTkZT6jZ55Tm9qDQicMJ6E2jA",
+  authDomain: "amrolocation.firebaseapp.com",
+  databaseURL: "https://amrolocation-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "amrolocation",
+  storageBucket: "amrolocation.firebasestorage.app",
+  messagingSenderId: "157641871095",
+  appId: "1:157641871095:web:4b197ee8474938c83c0df2"
+};
+
+
+const app = initializeApp(firebaseConfig);
+
+const db = getDatabase(app);
+
+const locationRef = ref(db, "sharedLocation");
+
+
+onValue(locationRef, (snapshot) => {
+
+  const data = snapshot.val();
+
+  if (!data) {
+    document.getElementById("status").innerText =
+      "Waiting for location...";
+    return;
+  }
+
+  const lat = data.latitude;
+  const lon = data.longitude;
+
+  document.getElementById("status").innerHTML =
+    "🟢 LIVE<br>" +
+    "Updated: " +
+    new Date(data.time).toLocaleTimeString();
+
+
+  document.getElementById("map").innerHTML = `
+    <iframe
+      width="100%"
+      height="100%"
+      frameborder="0"
+      src="https://www.google.com/maps?q=${lat},${lon}&output=embed">
+    </iframe>
+  `;
+
+});
+
+</script>
+
+</body>
+</html>
